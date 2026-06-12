@@ -1,16 +1,35 @@
 local zmq = require("lzmq")
-local struct = require("struct")
+local json = require("dkjson")
+local signal = require("posix.signal")
+local unistd = require("posix.unistd")
 
-local battery = require("components/battery")
+local battery = require("components.battery")
+
+local ipc_path = "ipc:///tmp/hypr_bridge.ipc"
 
 local context = zmq.context()
 local publisher = context:socket(zmq.PUB)
-assert(publisher:bind("ipc:///tmp/hypr_bridge.ipc"))
+assert(publisher:bind(ipc_path))
+
+signal.signal(signal.SIGINT, function()
+    publisher:close()
+    context:term()
+    os.remove(ipc_path)
+    os.exit(0)
+end)
 
 while true do
     local capacity, status = battery.info()
-    local content = struct.pack("<Bc1", capacity, status)
-    publisher:send(content)
 
-    os.execute("sleep 1")
+    local payload = {
+        module = "battery",
+        metrics = {
+            percent = capacity,
+            stats = status
+        }
+    }
+
+    publisher:send(json.encode(payload))
+
+    unistd.sleep(1)
 end
