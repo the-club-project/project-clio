@@ -19,13 +19,16 @@ signal.signal(signal.SIGINT, function()
 end)
 
 while true do
-    local capacity, status = battery.info()
+    local capacity, status, e_full, e_full_design, p_now, e_now = battery.info()
 
     local payload = {
-        module = "battery",
-        metrics = {
+        battery = {
             percent = capacity,
-            stats = status
+            stats = status,
+            energy_full = e_full,
+            energy_full_design = e_full_design,
+            power_now = p_now,
+            energy_now = e_now
         }
     }
 
