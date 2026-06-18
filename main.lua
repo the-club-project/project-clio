@@ -4,6 +4,7 @@ local signal = require("posix.signal")
 local unistd = require("posix.unistd")
 
 local battery = require("components.battery")
+local bluetooth = require("components.bluetooth")
 
 local ipc_path = "ipc:///tmp/hypr_bridge.ipc"
 
@@ -20,6 +21,7 @@ end)
 
 while true do
     local capacity, status, e_full, e_full_design, p_now, e_now = battery.info()
+    local powered, connected, d_name, s_results = bluetooth.info()
 
     local payload = {
         battery = {
@@ -29,6 +31,12 @@ while true do
             energy_full_design = e_full_design,
             power_now = p_now,
             energy_now = e_now
+        },
+        bluetooth = {
+            powered = powered, 
+            connected = connected, 
+            device_name = d_name, 
+            scan_results = s_results
         }
     }
 
