@@ -41,4 +41,14 @@ function bluetooth.info()
     return powered, connected, device_name, scan_results
 end
 
+function bluetooth.listen(cmd)
+    if cmd.action == "power" then
+        if cmd.value == "on" then
+            os.execute("bluetoothctl power on 2>/dev/null")
+        else
+            os.execute("bluetoothctl power off 2>/dev/null")
+        end
+    end
+end
+
 return bluetooth

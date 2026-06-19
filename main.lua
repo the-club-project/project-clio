@@ -3,6 +3,7 @@ local json = require("dkjson")
 local signal = require("posix.signal")
 local unistd = require("posix.unistd")
 
+
 local battery = require("components.battery")
 local bluetooth = require("components.bluetooth")
 
@@ -26,12 +27,18 @@ signal.signal(signal.SIGINT, function()
     os.exit(0)
 end)
 
+local modules = {["bluetooth"] = bluetooth}
+
 while true do
+    -- local mem_kb = collectgarbage("count")
+    -- print(string.format("CLIO MEMORY USAGE: %.2f KB", mem_kb))
     local ready = poller:poll(0)
     if ready > 0 then
         local msg = responder:recv()
         local req = json.decode(msg)
-        print(msg)
+        if modules[req.sender] then
+            modules[req.sender].listen(req)
+        end
         local reply = {received = true}
         responder:send(json.encode(reply))
     end
@@ -58,5 +65,5 @@ while true do
 
     publisher:send(json.encode(payload))
 
-    unistd.sleep(1)
+    unistd.sleep(0.5)
 end
