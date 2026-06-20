@@ -31,9 +31,7 @@ function bluetooth.info()
         for line in f_devices:lines() do
             local mac, name = line:match("Device ([%w:]+) (.*)")
             if mac and name then
-                if name ~= device_name then
-                    table.insert(scan_results, {mac = mac, name = name})
-                end
+                table.insert(scan_results, {mac = mac, name = name})
             end
         end
     end
