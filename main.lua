@@ -35,11 +35,12 @@ while true do
     local ready = poller:poll(0)
     if ready > 0 then
         local msg = responder:recv()
+        print(msg)
         local req = json.decode(msg)
         if modules[req.sender] then
             modules[req.sender].listen(req)
         end
-        local reply = {received = true}
+        local reply = {sender = req.sender, received = true, action = req.sender, status = "done"}
         responder:send(json.encode(reply))
     end
 
