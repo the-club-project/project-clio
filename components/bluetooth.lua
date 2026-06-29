@@ -26,7 +26,7 @@ function bluetooth.info()
         end
     end
 
-    local f_devices = io.popen("bluetoothctl devices Paired 2>/dev/null")
+    local f_devices = io.popen("bluetoothctl devices 2>/dev/null")
     if f_devices then
         for line in f_devices:lines() do
             local mac, name = line:match("Device ([%w:]+) (.*)")
@@ -46,6 +46,9 @@ function bluetooth.listen(cmd)
         else
             os.execute("bluetoothctl power off 2>/dev/null")
         end
+    end
+    if cmd.action == "scan" then
+        os.execute("bluetoothctl --timeout 10 scan on >/dev/null 2>&1 &")
     end
 end
 
